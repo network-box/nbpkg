@@ -215,34 +215,6 @@ class Commands(pyrpkg.Commands):
         """Synchronise with the Fedora dist-git module."""
         self.fedora_remote.fetch()
 
-    def mockbuild(self, mockargs=[], arch=None):
-        """Build the package in mock, using mockargs
-
-        Log the output and returns nothing
-
-        This is copied verbatim from the fedpkg sources. Any change here should
-        be pushed there as well, perhaps even to rpkg.
-        """
-        # Make sure we have an srpm to run on
-        self.srpm()
-
-        if not arch:
-            arch = self.localarch
-
-        # FIXME: This should be the same as fedpkg, but I'm running mockbuild twice
-        mockconfig = self.mockconfig.replace(self.localarch, arch)
-
-        # setup the command
-        cmd = ['mock']
-        cmd.extend(mockargs)
-        cmd.extend(['-r', mockconfig, '--resultdir',
-                    os.path.join(self.path, 'results_%s' % self.module_name, self.ver, self.rel),
-                    '--rebuild', self.srpmname])
-
-        # Run the command
-        self._run_command(cmd)
-        return
-
 ######################################################################
 # FIXME: Deploy Koji/Bodhi, remove this function to use the rpkg one #
 ######################################################################

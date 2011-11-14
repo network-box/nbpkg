@@ -30,7 +30,6 @@ class nbpkgClient(cliClient):
     def setup_nb_subparsers(self):
         """Register the Network Box specific targets."""
         self.register_fetchfedora()
-        self.register_mockbuild()
 
     # -- New targets ---------------------------------------------------------
     # --- First register them ---
@@ -42,56 +41,12 @@ class nbpkgClient(cliClient):
                         Fedora, adding the remote if necessary.')
         fetchfedora_parser.set_defaults(command=self.fetchfedora)
 
-    def register_mockbuild(self):
-        """Register the mockbuild target
-
-        This is copied verbatim from the fedpkg sources. Any change here should
-        be pushed there as well, perhaps even to rpkg.
-        """
-        mockbuild_parser = self.subparsers.add_parser('mockbuild',
-                                             help='Local test build using '
-                                             'mock',
-                                             description='This will use \
-                                             the mock utility to build the \
-                                             package for the distribution \
-                                             detected from branch \
-                                             information.  This can be \
-                                             overridden using the global \
-                                             --dist option.  Your user must \
-                                             be in the local "mock" group.')
-        mockbuild_parser.add_argument('--arch', help = 'Arch to build for',
-                                      default = None)
-        mockbuild_parser.set_defaults(command=self.mockbuild)
-
     # --- Then implement them ---
     def fetchfedora(self):
         try:
             self.cmd.fetchfedora()
         except Exception, e:
             self.log.error('Could not run fetchfedora: %s' % e)
-            sys.exit(1)
-
-    def mockbuild(self):
-        """This is copied verbatim from the fedpkg sources. Any change here
-        should be pushed there as well, perhaps even to rpkg.
-        """
-        try:
-            self.cmd.sources()
-        except Exception, e:
-            self.log.error('Could not download sources: %s' % e)
-            sys.exit(1)
-
-        # Pick up any mockargs from the env
-        mockargs = []
-        try:
-            mockargs = os.environ['MOCKARGS'].split()
-        except KeyError:
-            # there were no args
-            pass
-        try:
-            self.cmd.mockbuild(mockargs, arch=self.args.arch)
-        except Exception, e:
-            self.log.error('Could not run mockbuild: %s' % e)
             sys.exit(1)
 
     # -- Overloaded targets --------------------------------------------------
