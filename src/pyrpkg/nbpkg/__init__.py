@@ -227,7 +227,10 @@ class Commands(pyrpkg.Commands):
         self.srpm()
 
         if not arch:
-            self.mockconfig = self.mockconfig.replace(self.localarch, arch)
+            arch = self.localarch
+
+        # FIXME: This should be the same as fedpkg, but I'm running mockbuild twice
+        mockconfig = self.mockconfig.replace(self.localarch, arch)
 
         # setup the command
         cmd = ['mock']
@@ -239,3 +242,82 @@ class Commands(pyrpkg.Commands):
         # Run the command
         self._run_command(cmd)
         return
+
+######################################################################
+# FIXME: Deploy Koji/Bodhi, remove this function to use the rpkg one #
+######################################################################
+    def load_kojisession(self, anon=False):
+        class KojiSession(object):
+            def logout(*args, **kwargs):
+                pass
+
+        self._anon_kojisession = KojiSession()
+        self._kojisession = KojiSession()
+
+    def build(self, skip_tag=False, scratch=False, background=False,
+              url=None, chain=None, arches=None, sets=False):
+        """Initiate a build of the module.  Available options are:
+        [... snip ...]
+
+        We overload this temporarily, because we don't have a Koji server.
+        """
+        import glob, shutil, subprocess
+
+        REPOS_HOST = "root@10.8.16.150"
+        REPOS_ROOT = "/srv/repos/nbrs/experimental/%(freeness)s/%(arch)s"
+        CREATEREPO_CACHE = "/var/cache/createrepo/nbrs/experimental/%(freeness)s/%(arch)s"
+
+        d = dict()
+        if "nonfree" in self.remote:
+            d['freeness'] = 'nonfree'
+        else:
+            d['freeness'] = 'free'
+
+        # Check for default build arches
+        if not arches:
+            arches = ['i386', 'x86_64']
+
+        for arch in arches:
+            if os.path.exists('results_%s' % self.module_name):
+                shutil.rmtree('results_%s' % self.module_name)
+
+            # First build the package
+            self.mockbuild(arch=arch)
+
+            # Then upload the results
+            resultdir = os.path.join(self.path, "results_%s" % self.module_name,
+                                     self.ver, self.rel)
+
+            for result in glob.iglob(os.path.join(resultdir, '*.rpm')):
+                if result.endswith('src.rpm'):
+                    d['arch'] = 'SRPMS'
+                else:
+                    d['arch'] = arch
+
+                dst = "%s:%s" % (REPOS_HOST, REPOS_ROOT%d)
+
+                subprocess.check_call(["scp", "-q", result, dst])
+                os.unlink(result)
+
+        # Then compose the repositories
+        for arch in arches + ['SRPMS']:
+            d['arch'] = arch
+
+            createrepo_cmd = [
+                    "ssh", "-q", REPOS_HOST,
+                    "createrepo", "--update",
+                                  "--changelog-limit", "10",
+                                  ]
+
+            # The comps file is only in nonfree, as some nb* packages are mandatory for some groups
+            if d['freeness'] == 'nonfree':
+                createrepo_cmd.extend([
+                                  "-g", "comps-nbrs5.xml",
+                    ])
+
+            createrepo_cmd.extend([
+                                  "-c", CREATEREPO_CACHE % d,
+                                  REPOS_ROOT % d,
+                                  ])
+            subprocess.check_call(createrepo_cmd)
+######################################################################
