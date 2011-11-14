@@ -282,11 +282,9 @@ class Commands(pyrpkg.Commands):
                                   "--changelog-limit", "10",
                                   ]
 
-            # The comps file is only in nonfree, as some nb* packages are mandatory for some groups
-            if d['freeness'] == 'nonfree':
-                createrepo_cmd.extend([
-                                  "-g", "comps-nbrs5.xml",
-                    ])
+            createrepo_cmd.extend([
+                "-g", "comps-nbrs5-%(freeness)s.xml" % d,
+                ])
 
             createrepo_cmd.extend([
                                   "-c", CREATEREPO_CACHE % d,
