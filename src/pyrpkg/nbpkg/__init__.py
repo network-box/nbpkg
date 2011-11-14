@@ -254,7 +254,8 @@ class Commands(pyrpkg.Commands):
                 shutil.rmtree('results_%s' % self.module_name)
 
             # First build the package
-            self.mockbuild(arch=arch)
+            root = self.mockconfig.replace(self.localarch, arch)
+            self.mockbuild(root=root)
 
             # Then upload the results
             resultdir = os.path.join(self.path, "results_%s" % self.module_name,
