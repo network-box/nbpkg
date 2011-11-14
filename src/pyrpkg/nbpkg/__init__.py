@@ -49,14 +49,12 @@ class Commands(pyrpkg.Commands):
             self.distval = self.branch_merge.split('nb')[1]
             self.distvar = 'nbrs'
             self.dist = 'nb%s' % self.distval
-            self.override = 'nb%s-override' % self.distval
 
         elif re.match(r'nbplayground$', self.branch_merge):
             # E.g: 'networkbox-nonfree/nbplayground'
             self.distval = self._findmasterbranch()
             self.distvar = 'nbrs'
             self.dist = 'nb%s' % self.distval
-            self.override = None
 
         elif re.match(r'nb-fedora\d\d$', self.branch_merge):
             raise NotImplementedError("Can't handle the local Fedora branch "+\
