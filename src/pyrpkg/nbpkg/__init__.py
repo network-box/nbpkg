@@ -263,9 +263,9 @@ class Commands(pyrpkg.Commands):
         """
         import glob, shutil, subprocess
 
-        REPOS_HOST = "root@10.8.16.150"
-        REPOS_ROOT = "/srv/repos/nbrs/experimental/%(freeness)s/%(arch)s"
-        CREATEREPO_CACHE = "/var/cache/createrepo/nbrs/experimental/%(freeness)s/%(arch)s"
+        REPOS_HOST = "root@10.12.18.81"
+        REPOS_ROOT = "/store/database/repos/nbrs/development/5.0/%(freeness)s/%(arch)s"
+        CREATEREPO_CACHE = "/var/cache/createrepo/nbrs/development/5.0/%(freeness)s/%(arch)s"
 
         d = dict()
         if "nonfree" in self.remote:
