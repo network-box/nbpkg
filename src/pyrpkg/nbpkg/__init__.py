@@ -22,6 +22,20 @@ import pyrpkg
 import cli
 
 class Commands(pyrpkg.Commands):
+    def __init__(self, path, lookaside, lookasidehash, lookaside_cgi,
+            gitbaseurl, anongiturl, branchre, remote, kojiconfig,
+            build_client, user=None, dist=None, target=None):
+        """Init the object and some configuration details.
+
+        We need to overload this to add our own attributes and properties.
+        """
+        super(Commands, self).__init__(path, lookaside, lookasidehash,
+                lookaside_cgi, gitbaseurl, anongiturl, branchre, remote,
+                kojiconfig, build_client, user, dist, target)
+
+        # New properties
+        self._fedora_remote = None
+
     # -- Overloaded property loaders -----------------------------------------
     def load_rpmdefines(self):
         """Populate rpmdefines based on branch data.
@@ -94,6 +108,28 @@ class Commands(pyrpkg.Commands):
         else:
             self._target = '%s-candidate' % self.branch_merge
 
+    # -- New properties ------------------------------------------------------
+    @property
+    def fedora_remote(self):
+        """Return the remote object associated with the Fedora dist-git."""
+        if not self._fedora_remote:
+            self.load_fedora_remote()
+        return self._fedora_remote
+
+    def load_fedora_remote(self):
+        """Search if we already have a fedora remote."""
+        for remote in self.repo.remotes:
+            # FIXME: Don't hard-code those values, get the fedpkg config
+            if remote.name == 'fedora':
+                self._fedora_remote = remote
+                break
+
+        else:
+            # We finished iterating without finding a Fedora remote
+            # FIXME: Don't hard-code those values, get the fedpkg config
+            self._fedora_remote = self.repo.create_remote('fedora',
+                    'git://pkgs.fedoraproject.org/%s' % self.module_name)
+
     # -- New features --------------------------------------------------------
     def _findmasterbranch(self):
         """Find the right "nbrs" for master"""
@@ -147,6 +183,10 @@ class Commands(pyrpkg.Commands):
             # This is what we will do in the meantime
             #
             return '5.0'
+
+    def fetchfedora(self):
+        """Synchronise with the Fedora dist-git module."""
+        self.fedora_remote.fetch()
 
     def mockbuild(self, mockargs=[], arch=None):
         """Build the package in mock, using mockargs

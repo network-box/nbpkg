@@ -29,10 +29,19 @@ class nbpkgClient(cliClient):
 
     def setup_nb_subparsers(self):
         """Register the Network Box specific targets."""
+        self.register_fetchfedora()
         self.register_mockbuild()
 
     # -- New targets ---------------------------------------------------------
     # --- First register them ---
+    def register_fetchfedora(self):
+        """Register the fetchfedora command."""
+        fetchfedora_parser = self.subparsers.add_parser('fetchfedora',
+                help='Get changes from Fedora',
+                description='This will fetch the history of the module in \
+                        Fedora, adding the remote if necessary.')
+        fetchfedora_parser.set_defaults(command=self.fetchfedora)
+
     def register_mockbuild(self):
         """Register the mockbuild target
 
@@ -55,6 +64,13 @@ class nbpkgClient(cliClient):
         mockbuild_parser.set_defaults(command=self.mockbuild)
 
     # --- Then implement them ---
+    def fetchfedora(self):
+        try:
+            self.cmd.fetchfedora()
+        except Exception, e:
+            self.log.error('Could not run fetchfedora: %s' % e)
+            sys.exit(1)
+
     def mockbuild(self):
         """This is copied verbatim from the fedpkg sources. Any change here
         should be pushed there as well, perhaps even to rpkg.
