@@ -94,6 +94,15 @@ class nbpkgClient(cliClient):
             self.log.error('Could not run mockbuild: %s' % e)
             sys.exit(1)
 
+    # -- Overloaded targets --------------------------------------------------
+    def push(self):
+        # TODO: this could be submitted to rpkg
+        try:
+            self.cmd.push()
+        except Exception, e:
+            self.log.error('Could not push: %s' % e)
+            sys.exit(1)
+
 
 if __name__ == '__main__':
     client = nbpkgClient()

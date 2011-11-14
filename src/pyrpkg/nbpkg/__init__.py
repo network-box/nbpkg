@@ -130,6 +130,33 @@ class Commands(pyrpkg.Commands):
             self._fedora_remote = self.repo.create_remote('fedora',
                     'git://pkgs.fedoraproject.org/%s' % self.module_name)
 
+    # -- Overloaded features -------------------------------------------------
+    def push(self):
+        """Push changes to the remote repository"""
+        # First check that we are not pushing to Fedora
+        # FIXME: Ugly screen scraping
+        push_remote = self.repo.git.config('--get',
+                'branch.%s.remote' % self.branch_merge)
+        if push_remote != self.remote:
+            raise pyrpkg.rpkgError('Can only push to the Network Box ' + \
+                    'infrastructure')
+
+        # Then only push the relevant branches on the appropriate remote
+        cmd = ['git', 'push', self.remote]
+
+        # FIXME: Ugly screen scraping, functional programming style
+        merged = map(lambda x: x.strip(),
+                     filter(lambda x: re.match(self.branchre, x),
+                            git.Git().branch('--merged',
+                                             self.repo.active_branch.name
+                                             ).split()))
+
+        if not merged:
+            raise pyrpkg.rpkgError('Could not find any local branch to push')
+
+        cmd.extend(merged)
+        self._run_command(cmd, cwd=self.path)
+
     # -- New features --------------------------------------------------------
     def _findmasterbranch(self):
         """Find the right "nbrs" for master"""
