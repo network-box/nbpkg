@@ -49,7 +49,6 @@ class Commands(pyrpkg.Commands):
             self.distval = self.branch_merge.split('nb')[1]
             self.distvar = 'nbrs'
             self.dist = 'nb%s' % self.distval
-            self.mockconfig = 'nbrs-%s-%s' % (self.distval, self.localarch)
             self.override = 'nb%s-override' % self.distval
 
         elif re.match(r'nbplayground$', self.branch_merge):
@@ -57,7 +56,6 @@ class Commands(pyrpkg.Commands):
             self.distval = self._findmasterbranch()
             self.distvar = 'nbrs'
             self.dist = 'nb%s' % self.distval
-            self.mockconfig = 'nbrs-experimental-%s' % self.localarch
             self.override = None
 
         elif re.match(r'nb-fedora\d\d$', self.branch_merge):
@@ -101,12 +99,14 @@ class Commands(pyrpkg.Commands):
 
     def load_target(self):
         """This creates the target attribute based on branch merge"""
-
         if self.branch_merge == 'experimental':
-            branch_merge = self._findmasterbranch()
-            self._target = 'nb%s-candidate' % branch_merge
+            branch = 'nb%s' % self._findmasterbranch()
         else:
-            self._target = '%s-candidate' % self.branch_merge
+            branch = self.branch_merge
+
+        freeness = 'nonfree' if ('nonfree' in self.remote) else 'free'
+
+        self._target = '%s-%s-candidate' % (branch, freeness)
 
     # -- New properties ------------------------------------------------------
     @property
