@@ -65,12 +65,16 @@ class Commands(pyrpkg.Commands):
                     "just yet, ask Mathieu to implement it.")
 
         elif re.match(r'nb-rhel\d$', self.branch_merge):
-            raise NotImplementedError("Can't handle the local RHEL branch " + \
-                    "just yet, ask Mathieu to implement it.")
+            self.distval = self.branch_merge.split('nb-rhel')[1]
+            self.distvar = 'rhel'
+            self.dist = 'el%s' % self.distval
+            self.mockconfig = 'epel-%s-%s' % (self.distval, self.localarch)
 
         elif re.match(r'nb-epel\d$', self.branch_merge):
-            raise NotImplementedError("Can't handle the local EPEL branch " + \
-                    "just yet, ask Mathieu to implement it.")
+            self.distval = self.branch_merge.split('nb-epel')[1]
+            self.distvar = 'rhel'
+            self.dist = 'el%s' % self.distval
+            self.mockconfig = 'epel-%s-%s' % (self.distval, self.localarch)
 
         else:
             raise pyrpkg.rpkgError('Could not find the dist from branch name '
