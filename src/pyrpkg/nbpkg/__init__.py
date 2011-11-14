@@ -12,6 +12,7 @@
 # This program is based on the GPLv2+-licensed fedpkg library by Jesse Keating:
 #     https://fedorahosted.org/fedora-packager
 
+import os
 import re
 
 import git
