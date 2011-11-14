@@ -241,7 +241,7 @@ class Commands(pyrpkg.Commands):
 
     def fetchfedora(self):
         """Synchronise with the Fedora dist-git module."""
-        self.fedora_remote.fetch()
+        self.fedora_remote.fetch('--no-tags')
 
 ######################################################################
 # FIXME: Deploy Koji/Bodhi, remove this function to use the rpkg one #
