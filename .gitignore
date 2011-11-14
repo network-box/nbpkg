@@ -1,0 +1,13 @@
+# -- Auto-generated setuptools files -----------------------------------------
+build
+dist
+MANIFEST
+*.egg-info
+
+# -- Python compiled files ---------------------------------------------------
+*.pyo
+*.pyc
+
+# -- Editors temp files ------------------------------------------------------
+*.swp
+*~
