@@ -211,6 +211,32 @@ class Commands(pyrpkg.Commands):
             #
             return '5.0'
 
+    def retire(self, message=None):
+        """Delete all tracked files and commit a new dead.package file
+
+        Use optional message in commit.
+
+        Runs the commands and returns nothing
+
+        This is a copy-paste from fedpkg. Changes here must be examined and
+        eventually pushed upstream.
+        """
+
+        cmd = ['git', 'rm', '-rf', '.']
+        self._run_command(cmd, cwd=self.path)
+
+        if not message:
+            message = 'Package is retired'
+
+        fd = open(os.path.join(self.path, 'dead.package'), 'w')
+        fd.write(message + '\n')
+        fd.close()
+
+        cmd = ['git', 'add', os.path.join(self.path, 'dead.package')]
+        self._run_command(cmd, cwd=self.path)
+
+        self.commit(message=message)
+
     def fetchfedora(self):
         """Synchronise with the Fedora dist-git module."""
         self.fedora_remote.fetch()

@@ -29,10 +29,28 @@ class nbpkgClient(cliClient):
 
     def setup_nb_subparsers(self):
         """Register the Network Box specific targets."""
+        self.register_retire()
         self.register_fetchfedora()
 
     # -- New targets ---------------------------------------------------------
     # --- First register them ---
+    def register_retire(self):
+        """Register the retire target"""
+
+        retire_parser = self.subparsers.add_parser('retire',
+                                              help='Retire a package',
+                                              description='This command will \
+                                              remove all files from the repo \
+                                              and leave a dead.package file.')
+        retire_parser.add_argument('-p', '--push',
+                                   default=False,
+                                   action='store_true',
+                                   help='Push changes to remote repository')
+        retire_parser.add_argument('msg',
+                                   nargs='?',
+                                   help='Message for retiring the package')
+        retire_parser.set_defaults(command=self.retire)
+
     def register_fetchfedora(self):
         """Register the fetchfedora command."""
         fetchfedora_parser = self.subparsers.add_parser('fetchfedora',
@@ -42,6 +60,15 @@ class nbpkgClient(cliClient):
         fetchfedora_parser.set_defaults(command=self.fetchfedora)
 
     # --- Then implement them ---
+    def retire(self):
+        try:
+            self.cmd.retire(self.args.msg)
+        except Exception, e:
+            self.log.error('Could not retire package: %s' % e)
+            sys.exit(1)
+        if self.args.push:
+            self.push()
+
     def fetchfedora(self):
         try:
             self.cmd.fetchfedora()
