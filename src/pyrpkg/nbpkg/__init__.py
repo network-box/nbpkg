@@ -101,11 +101,7 @@ class Commands(pyrpkg.Commands):
 
     def load_target(self):
         """This creates the target attribute based on branch merge"""
-        if self.branch_merge == 'experimental':
-            branch = 'nb%s' % self._findmasterbranch()
-        else:
-            branch = self.branch_merge
-
+        branch = self.branch_merge
         freeness = 'nonfree' if ('nonfree' in self.remote) else 'free'
 
         self._target = '%s-%s-candidate' % (branch, freeness)
