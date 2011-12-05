@@ -194,20 +194,15 @@ class Commands(pyrpkg.Commands):
             #
             # This is what we should do, once we have Koji
             #
-#            # We may not have NBRSes. Find out what experimental target does.
-#            try:
-#                experimentaltarget = self.anon_kojisession.getBuildTarget(
-#                                                              'experimental')
-#            except:
-#                # We couldn't hit koji, bail.
-#                raise pyrpkg.rpkgError('Unable to query koji to find \
-#                                       experimental target')
-#            desttag = experimentaltarget['dest_tag_name']
-#            return desttag.replace('nb', '')
-            #
-            # This is what we will do in the meantime
-            #
-            return '5.0'
+            # We may not have NBRSes. Find out what experimental target does.
+            try:
+                experimentaltarget = self.anon_kojisession.getBuildTarget(self.target)
+            except:
+                # We couldn't hit koji, bail.
+                raise pyrpkg.rpkgError('Unable to query koji to find \
+                                       experimental target')
+            desttag = experimentaltarget['dest_tag_name']
+            return desttag.replace('nb', '')
 
     def retire(self, message=None):
         """Delete all tracked files and commit a new dead.package file
