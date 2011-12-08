@@ -85,12 +85,6 @@ class nbpkgClient(cliClient):
             self.log.error('Could not push: %s' % e)
             sys.exit(1)
 
-######################################################################
-# FIXME: Deploy Koji/Bodhi, remove this function to use the rpkg one #
-######################################################################
-    def _watch_koji_tasks(self, *args, **kwargs):
-        pass
-######################################################################
 
 if __name__ == '__main__':
     client = nbpkgClient()
