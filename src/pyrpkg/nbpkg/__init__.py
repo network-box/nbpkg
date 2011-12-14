@@ -202,6 +202,10 @@ class Commands(pyrpkg.Commands):
                 raise pyrpkg.rpkgError('Unable to query koji to find \
                                        experimental target')
             desttag = experimentaltarget['dest_tag_name']
+
+            # Remove the trailing '-free' or '-nonfree'
+            desttag = desttag.split('-')[0]
+
             return desttag.replace('nb', '')
 
     def retire(self, message=None):
