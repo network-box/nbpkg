@@ -36,7 +36,7 @@ _nbpkg()
     local options="--help -v -q"
     local options_value="--dist --user --path"
     local commands="build chain-build ci clean clog clone co commit compile diff fetchfedora gimmespec giturl help \
-    import install lint local mockbuild new new-sources patch prep pull push retire scratch-build sources \
+    import install lint local mockbuild new new-sources patch prep pull push retire scratch-build sources sourcesfedora \
     srpm switch-branch tag tag-request unused-patches update upload verify-files verrel"
 
     # parse main options and get command
@@ -93,7 +93,7 @@ _nbpkg()
     local after= after_more=
 
     case $command in
-        help|clog|fetchfedora|gimmespec|giturl|lint|mockbuild|new|push|unused-patches|update|verrel)
+        help|clog|fetchfedora|gimmespec|giturl|lint|mockbuild|new|push|sourcesfedora|unused-patches|update|verrel)
             ;;
         build)
             options="--nowait --background --skip-tag --scratch"
