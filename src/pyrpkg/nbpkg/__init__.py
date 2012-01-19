@@ -124,9 +124,16 @@ class Commands(pyrpkg.Commands):
 
         else:
             # We finished iterating without finding a Fedora remote
+            try:
+                module_name = self.module_name
+            except pyrpkg.rpkgError, e:
+                # This happens when we don't have a spec file yet (e.g merging
+                # from Fedora for the first time)
+                module_name = os.path.basename(self.path)
+
             # FIXME: Don't hard-code those values, get the fedpkg config
             self._fedora_remote = self.repo.create_remote('fedora',
-                    'git://pkgs.fedoraproject.org/%s' % self.module_name)
+                    'git://pkgs.fedoraproject.org/%s' % module_name)
 
     # -- Overloaded features -------------------------------------------------
     def push(self):
