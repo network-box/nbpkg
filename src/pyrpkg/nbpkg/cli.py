@@ -31,6 +31,7 @@ class nbpkgClient(cliClient):
         """Register the Network Box specific targets."""
         self.register_retire()
         self.register_fetchfedora()
+        self.register_sourcesfedora()
 
     # -- New targets ---------------------------------------------------------
     # --- First register them ---
@@ -59,6 +60,16 @@ class nbpkgClient(cliClient):
                         Fedora, adding the remote if necessary.')
         fetchfedora_parser.set_defaults(command=self.fetchfedora)
 
+    def register_sourcesfedora(self):
+        """Register the sourcesfedora command."""
+        sourcesfedora_parser = self.subparsers.add_parser('sourcesfedora',
+                help='Get sources from the Fedora lookaside cache',
+                description='This command will obtain the files listed as ' \
+                            'SourceX in the spec file, but instead of using' \
+                            ' the configured lookaside URL, it will use the' \
+                            ' Fedora one.')
+        sourcesfedora_parser.set_defaults(command=self.sourcesfedora)
+
     # --- Then implement them ---
     def retire(self):
         try:
@@ -74,6 +85,13 @@ class nbpkgClient(cliClient):
             self.cmd.fetchfedora()
         except Exception, e:
             self.log.error('Could not run fetchfedora: %s' % e)
+            sys.exit(1)
+
+    def sourcesfedora(self):
+        try:
+            self.cmd.sourcesfedora()
+        except Exception, e:
+            self.log.error('Could not run sourcesfedora: %s' % e)
             sys.exit(1)
 
     # -- Overloaded targets --------------------------------------------------

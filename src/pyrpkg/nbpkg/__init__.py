@@ -155,6 +155,18 @@ class Commands(pyrpkg.Commands):
         cmd.extend(merged)
         self._run_command(cmd, cwd=self.path)
 
+    def sources(self, outdir=None, lookasideurl=None):
+        """Fetch sources from a lookaside cache.
+
+        We overload it to allow fetching from a different lookaside cache than
+        the configured one.
+        """
+        if lookasideurl:
+            self.lookaside = lookasideurl
+
+        # Don't pass that additional parameter to our parent
+        super(Commands, self).sources(outdir=outdir)
+
     # -- New features --------------------------------------------------------
     def _findmasterbranch(self):
         """Find the right "nbrs" for master"""
@@ -237,3 +249,7 @@ class Commands(pyrpkg.Commands):
     def fetchfedora(self):
         """Synchronise with the Fedora dist-git module."""
         self.fedora_remote.fetch('--no-tags')
+
+    def sourcesfedora(self):
+        """Fetch sources from the Fedora lookaside cache."""
+        self.sources(lookasideurl="http://pkgs.fedoraproject.org/repo/pkgs")
