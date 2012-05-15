@@ -13,15 +13,29 @@
 # This program is based on the GPLv2+-licensed fedpkg tool by Jesse Keating:
 #     https://fedorahosted.org/fedpkg
 
-import pyrpkg.nbpkg
 import os
 import sys
 import logging
 import ConfigParser
 import argparse
 
+if 'home' in sys.argv[0]:
+    # Import nbpkg from the development tree
+    src_dir = os.path.dirname(sys.argv[0])
+    sys.path.insert(0, os.path.join(src_dir, 'pyrpkg'))
+    import nbpkg
+
+else:
+    import pyrpkg.nbpkg as nbpkg
+
+import pyrpkg
+
 
 CONF_ROOT = '/etc/rpkg'
+if 'home' in sys.argv[0]:
+    # Use the latest configs from the development tree
+    CONF_ROOT = os.path.dirname(sys.argv[0])
+
 FREE_CONF = os.path.join(CONF_ROOT, 'nbpkg.conf')
 NONFREE_CONF = os.path.join(CONF_ROOT, 'nbpkg-nonfree.conf')
 
@@ -79,8 +93,8 @@ if not os.path.exists(args.config) and not other[-1] in ['--help', '-h', 'help']
 config = ConfigParser.SafeConfigParser()
 config.read(args.config)
 
-client = pyrpkg.nbpkg.cli.nbpkgClient(config)
-client.do_imports(site='pyrpkg.nbpkg')
+client = nbpkg.cli.nbpkgClient(config)
+client.do_imports(site='nbpkg')
 client.parse_cmdline()
 
 if not client.args.path:
