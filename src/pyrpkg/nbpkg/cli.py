@@ -23,7 +23,9 @@ class nbpkgClient(cliClient):
         super(nbpkgClient, self).__init__(config, name)
 
         # Handle the free/nonfree modules
-        self.parser.add_argument('-z', '--nonfree', action='store_true', help='Interact with the nonfree modules we build')
+        self.parser.add_argument('--nonfree', action='store_true',
+                                 help='Interact with the nonfree modules ' \
+                                      'we build')
 
         self.setup_nb_subparsers()
 

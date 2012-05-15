@@ -27,8 +27,10 @@ NONFREE_CONF = os.path.join(CONF_ROOT, 'nbpkg-nonfree.conf')
 
 # Setup an argparser and parse the known commands to get the config file
 parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('-z', '--nonfree', action='store_true', help='Interact with the nonfree modules we build')
-parser.add_argument('--path', default=None, help='Define the directory to work in (defaults to cwd)')
+parser.add_argument('--nonfree', action='store_true',
+                    help='Interact with the nonfree modules we build')
+parser.add_argument('--path', default=None,
+                    help='Define the directory to work in (defaults to cwd)')
 
 (args, other) = parser.parse_known_args()
 
