@@ -79,6 +79,7 @@ class nbpkgClient(cliClient):
         except Exception, e:
             self.log.error('Could not retire package: %s' % e)
             sys.exit(1)
+
         if self.args.push:
             self.push()
 
