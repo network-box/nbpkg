@@ -22,7 +22,6 @@ import argparse
 
 
 CONF_ROOT = '/etc/rpkg'
-config_file = ''
 FREE_CONF = os.path.join(CONF_ROOT, 'nbpkg.conf')
 NONFREE_CONF = os.path.join(CONF_ROOT, 'nbpkg-nonfree.conf')
 
@@ -46,11 +45,11 @@ def local_debug(message, err=False):
 if not 'help' in other and not '-h' in other and not '--help' in other:
     if args.nonfree:
 	# The user specified, let's honour his wish
-        config_file = NONFREE_CONF
+        args.config = NONFREE_CONF
 
     elif 'clone' in other or 'co' in other:
         # Can't autodetect for clone, nonfree has to be specified if necessary
-        config_file = FREE_CONF
+        args.config = FREE_CONF
 
     elif os.path.isdir('.git') or args.path:
         # Try to autodetect, based on the name of the remote
@@ -62,11 +61,12 @@ if not 'help' in other and not '-h' in other and not '--help' in other:
             remotes = repo_git.remote('-v').split('\n')
             for remote in remotes:
                 if 'nonfree' in remote:
-                    config_file = NONFREE_CONF
+                    args.config = NONFREE_CONF
                     break
+
             else:
                 # We never ran the 'break' above
-                config_file = FREE_CONF
+                args.config = FREE_CONF
 
         except Exception, e:
             sys.stderr.write("Could not automatically determine free/nonfree status, aborting.\n")
@@ -79,15 +79,15 @@ if not 'help' in other and not '-h' in other and not '--help' in other:
         sys.exit(1)
 
 # Make sure we have a sane config file
-if not os.path.exists(config_file) and not other[-1] in ['--help', '-h', 'help']:
-    sys.stderr.write('Invalid config file %s\n' % config_file)
+if not os.path.exists(args.config) and not other[-1] in ['--help', '-h', 'help']:
+    sys.stderr.write('Invalid config file %s\n' % args.config)
     sys.exit(1)
 
 # Setup a configuration object and read config file data
 config = ConfigParser.SafeConfigParser()
-config.read(config_file)
+config.read(args.config)
 
-local_debug("Using config %s" % config_file)
+local_debug("Using config %s" % args.config)
 
 client = pyrpkg.nbpkg.cli.nbpkgClient(config)
 client.do_imports(site='pyrpkg.nbpkg')
