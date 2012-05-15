@@ -34,14 +34,6 @@ parser.add_argument('--path', default=None,
 
 (args, other) = parser.parse_known_args()
 
-def local_debug(message, err=False):
-    """Simple debug function to have a verbose mode here as well."""
-    if '-v' in other or '--verbose' in other:
-        if err:
-            sys.stderr.write(message+"\n")
-        else:
-            sys.stdout.write(message+"\n")
-
 # Magically handle the 'nonfree' switch unless the user is asking for help
 # Note: This is quite ugly
 if not 'help' in other and not '-h' in other and not '--help' in other:
@@ -72,7 +64,7 @@ if not 'help' in other and not '-h' in other and not '--help' in other:
 
         except Exception, e:
             sys.stderr.write("Could not automatically determine free/nonfree status, aborting.\n")
-            local_debug(e.stderr, err=True)
+            sys.stderr.write(e.stderr+'\n')
             sys.exit(1)
 
     else:
@@ -88,8 +80,6 @@ if not os.path.exists(args.config) and not other[-1] in ['--help', '-h', 'help']
 # Setup a configuration object and read config file data
 config = ConfigParser.SafeConfigParser()
 config.read(args.config)
-
-local_debug("Using config %s" % args.config)
 
 client = pyrpkg.nbpkg.cli.nbpkgClient(config)
 client.do_imports(site='pyrpkg.nbpkg')
@@ -116,6 +106,9 @@ elif client.args.q:
     log.setLevel(logging.WARNING)
 else:
     log.setLevel(logging.INFO)
+
+# We have a logger now, use it to debug the freeness
+log.debug("Using config %s" % args.config)
 
 # Run the necessary command
 try:
