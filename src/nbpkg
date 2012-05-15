@@ -48,11 +48,11 @@ elif os.path.isdir('.git') or args.path:
     # Try to autodetect, based on the name of the remote
     try:
         import git
-        repo_git = git.Git(args.path)
+        repo_git = git.Repo(args.path)
 
-        remotes = repo_git.remote('-v').split('\n')
-        for remote in remotes:
-            if 'nonfree' in remote:
+        for remote in repo_git.remotes:
+            if "nonfree" in remote.name or \
+               "nonfree" in remote.config_reader.get("url"):
                 args.config = NONFREE_CONF
                 break
 
