@@ -24,7 +24,8 @@ import cli
 class Commands(pyrpkg.Commands):
     def __init__(self, path, lookaside, lookasidehash, lookaside_cgi,
             gitbaseurl, anongiturl, branchre, remote, kojiconfig,
-            build_client, user=None, dist=None, target=None):
+            build_client, user=None, dist=None, target=None,
+            quiet=False):
         """Init the object and some configuration details.
 
         We need to overload this to add our own attributes and properties.
@@ -46,31 +47,31 @@ class Commands(pyrpkg.Commands):
         # Anything else is too dangerous and --dist should be used
         if re.match(r'nb\d\.\d$', self.branch_merge):
             # E.g: 'networkbox/nb5.0'
-            self.distval = self.branch_merge.split('nb')[1]
-            self.distvar = 'nbrs'
+            self._distval = self.branch_merge.split('nb')[1]
+            self._distvar = 'nbrs'
             self.dist = 'nb%s' % self.distval
 
         elif re.match(r'nbplayground$', self.branch_merge):
             # E.g: 'networkbox-nonfree/nbplayground'
-            self.distval = self._findmasterbranch()
-            self.distvar = 'nbrs'
+            self._distval = self._findmasterbranch()
+            self._distvar = 'nbrs'
             self.dist = 'nb%s' % self.distval
 
         elif re.match(r'nb-fedora\d\d$', self.branch_merge):
-            self.distval = self.branch_merge.split("nb-fedora")[1]
-            self.distvar = "fedora"
+            self._distval = self.branch_merge.split("nb-fedora")[1]
+            self._distvar = "fedora"
             self.dist = "fc%s" % self.distval
             self.mockconfig = "fedora-%s-%s" % (self._distval, self.localarch)
 
         elif re.match(r'nb-rhel\d$', self.branch_merge):
-            self.distval = self.branch_merge.split('nb-rhel')[1]
-            self.distvar = 'rhel'
+            self._distval = self.branch_merge.split('nb-rhel')[1]
+            self._distvar = 'rhel'
             self.dist = 'el%s' % self.distval
             self.mockconfig = 'epel-%s-%s' % (self.distval, self.localarch)
 
         elif re.match(r'nb-epel\d$', self.branch_merge):
-            self.distval = self.branch_merge.split('nb-epel')[1]
-            self.distvar = 'rhel'
+            self._distval = self.branch_merge.split('nb-epel')[1]
+            self._distvar = 'rhel'
             self.dist = 'el%s' % self.distval
             self.mockconfig = 'epel-%s-%s' % (self.distval, self.localarch)
 
