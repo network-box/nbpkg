@@ -11,7 +11,7 @@
 # the full text of the license.
 #
 # This program is based on the GPLv2+-licensed fedpkg tool by Jesse Keating:
-#     https://fedorahosted.org/fedora-packager
+#     https://fedorahosted.org/fedpkg
 
 import pyrpkg.nbpkg
 import os
