@@ -36,41 +36,39 @@ parser.add_argument('--path', default=None,
 
 # Magically handle the 'nonfree' switch unless the user is asking for help
 # Note: This is quite ugly
-if not 'help' in other and not '-h' in other and not '--help' in other:
-    if args.nonfree:
-	# The user specified, let's honour his wish
-        args.config = NONFREE_CONF
+if args.nonfree:
+    # The user specified, let's honour his wish
+    args.config = NONFREE_CONF
 
-    elif 'clone' in other or 'co' in other:
-        # Can't autodetect for clone, nonfree has to be specified if necessary
-        args.config = FREE_CONF
+elif 'clone' in other or 'co' in other:
+    # Can't autodetect for clone, nonfree has to be specified if necessary
+    args.config = FREE_CONF
 
-    elif os.path.isdir('.git') or args.path:
-        # Try to autodetect, based on the name of the remote
-        try:
-            import git
+elif os.path.isdir('.git') or args.path:
+    # Try to autodetect, based on the name of the remote
+    try:
+        import git
+        repo_git = git.Git(args.path)
 
-            repo_git = git.Git(args.path)
+        remotes = repo_git.remote('-v').split('\n')
+        for remote in remotes:
+            if 'nonfree' in remote:
+                args.config = NONFREE_CONF
+                break
 
-            remotes = repo_git.remote('-v').split('\n')
-            for remote in remotes:
-                if 'nonfree' in remote:
-                    args.config = NONFREE_CONF
-                    break
+        else:
+            # We never ran the 'break' above
+            args.config = FREE_CONF
 
-            else:
-                # We never ran the 'break' above
-                args.config = FREE_CONF
-
-        except Exception, e:
-            sys.stderr.write("Could not automatically determine free/nonfree status, aborting.\n")
-            sys.stderr.write(e.stderr+'\n')
-            sys.exit(1)
-
-    else:
+    except Exception, e:
         sys.stderr.write("Could not automatically determine free/nonfree status, aborting.\n")
-        sys.stderr.write("You probably aren't in a cloned directory or forgot to specify the --path option.\n")
+        sys.stderr.write(e.stderr+'\n')
         sys.exit(1)
+
+else:
+    sys.stderr.write("Could not automatically determine free/nonfree status, aborting.\n")
+    sys.stderr.write("You probably aren't in a cloned directory or forgot to specify the --path option.\n")
+    sys.exit(1)
 
 # Make sure we have a sane config file
 if not os.path.exists(args.config) and not other[-1] in ['--help', '-h', 'help']:
