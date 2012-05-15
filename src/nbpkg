@@ -62,7 +62,7 @@ elif os.path.isdir('.git') or args.path:
 
     except Exception, e:
         sys.stderr.write("Could not automatically determine free/nonfree status, aborting.\n")
-        sys.stderr.write(e.stderr+'\n')
+        sys.stderr.write(str(e)+'\n')
         sys.exit(1)
 
 else:
