@@ -22,10 +22,6 @@ import argparse
 
 
 CONF_ROOT = '/etc/rpkg'
-if 'home' in sys.argv[0]:
-    # Running a development version out of a cloned Git tree
-    CONF_ROOT = os.path.dirname(sys.argv[0])
-
 config_file = ''
 FREE_CONF = os.path.join(CONF_ROOT, 'nbpkg.conf')
 NONFREE_CONF = os.path.join(CONF_ROOT, 'nbpkg-nonfree.conf')
