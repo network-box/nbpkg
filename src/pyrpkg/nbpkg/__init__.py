@@ -57,8 +57,10 @@ class Commands(pyrpkg.Commands):
             self.dist = 'nb%s' % self.distval
 
         elif re.match(r'nb-fedora\d\d$', self.branch_merge):
-            raise NotImplementedError("Can't handle the local Fedora branch "+\
-                    "just yet, ask Mathieu to implement it.")
+            self.distval = self.branch_merge.split("nb-fedora")[1]
+            self.distvar = "fedora"
+            self.dist = "fc%s" % self.distval
+            self.mockconfig = "fedora-%s-%s" % (self._distval, self.localarch)
 
         elif re.match(r'nb-master$', self.branch_merge):
             raise NotImplementedError("Can't handle the local Fedora branch "+\
