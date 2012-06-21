@@ -98,6 +98,14 @@ class nbpkgClient(cliClient):
             sys.exit(1)
 
     # -- Overloaded targets --------------------------------------------------
+    def clone(self):
+        """Overload the rpkg method, to remove anonymous clone."""
+        if self.args.anonymous:
+            self.log.error("Anonymous clone is forbidden.")
+            sys.exit(1)
+
+        super(nbpkgClient, self).clone()
+
     def push(self):
         # TODO: this could be submitted to rpkg
         try:
