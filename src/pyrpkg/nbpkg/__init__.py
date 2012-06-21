@@ -32,7 +32,7 @@ class Commands(pyrpkg.Commands):
         """
         super(Commands, self).__init__(path, lookaside, lookasidehash,
                 lookaside_cgi, gitbaseurl, anongiturl, branchre, remote,
-                kojiconfig, build_client, user, dist, target)
+                kojiconfig, build_client, user, dist, target, quiet)
 
         # New properties
         self._fedora_remote = None
