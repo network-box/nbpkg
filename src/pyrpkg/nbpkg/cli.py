@@ -104,6 +104,10 @@ class nbpkgClient(cliClient):
             self.log.error("Anonymous clone is forbidden.")
             sys.exit(1)
 
+        if self.args.branches:
+            self.log.error("Just no.")
+            sys.exit(1)
+
         super(nbpkgClient, self).clone()
 
     def push(self):
