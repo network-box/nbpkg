@@ -3,7 +3,7 @@ from setuptools import setup, command
 
 setup(
     name = "nbpkg",
-    version = "5.0.1-svn22405",
+    version = "5.0.1",
     author = "Mathieu Bridon",
     author_email = "mathieu.bridon@network-box.com",
     description = "Utility to interact with the Network Box Packaging system",
