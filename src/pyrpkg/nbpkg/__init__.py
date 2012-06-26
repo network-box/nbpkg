@@ -36,6 +36,8 @@ class Commands(pyrpkg.Commands):
 
         # New properties
         self._fedora_remote = None
+        self._cert_file = None
+        self._ca_cert = None
 
     # -- Overloaded property loaders -----------------------------------------
     def load_rpmdefines(self):
@@ -134,6 +136,45 @@ class Commands(pyrpkg.Commands):
             self._fedora_remote = self.repo.create_remote('fedora',
                     'git://pkgs.fedoraproject.org/%s' % module_name)
 
+    @property
+    def cert_file(self):
+        """This property ensures the cert_file attribute
+
+        This is shamelessly copy-pasted from fedpkg.
+        Contribute any changes back upstream.
+        """
+        if not self._cert_file:
+            self.load_cert_files()
+        return self._cert_file
+
+    @property
+    def ca_cert(self):
+        """This property ensures the ca_cert attribute
+
+        This is shamelessly copy-pasted from fedpkg.
+        Contribute any changes back upstream.
+        """
+        if not self._ca_cert:
+            self.load_cert_files()
+        return self._ca_cert
+
+    def load_cert_files(self):
+        """This loads the cert_file attribute"""
+        import ConfigParser
+
+        with open(self.kojiconfig) as f:
+            config = ConfigParser.ConfigParser()
+            config.readfp(f)
+
+            if not config.has_section(os.path.basename(self.build_client)):
+                raise pyrpkg.rpkgError("Can't find the [%s] section in the "
+                                       "Koji config" % self.build_client)
+
+            self._cert_file = os.path.expanduser(config.get(self.build_client,
+                                                            "cert"))
+            self._ca_cert = os.path.expanduser(config.get(self.build_client,
+                                                          "serverca"))
+
     # -- Overloaded features -------------------------------------------------
     def push(self):
         """Push changes to the remote repository"""
@@ -172,6 +213,48 @@ class Commands(pyrpkg.Commands):
 
         # Don't pass that additional parameter to our parent
         super(Commands, self).sources(outdir=outdir)
+
+    def _create_curl(self):
+        """Common curl setup options used for all requests to lookaside.
+
+        This is shamelessly copy-pasted from fedpkg.
+        Contribute any changes back upstream.
+        """
+        import pycurl
+
+        # Overloaded to add cert files to curl objects
+        # Call the super class
+        curl = super(Commands, self)._create_curl()
+
+        # Set the users Fedora certificate:
+        if os.path.exists(self.cert_file):
+            curl.setopt(pycurl.SSLCERT, self.cert_file)
+        else:
+            self.log.warn("Missing certificate: %s" % self.cert_file)
+
+        # Set the Fedora CA certificate:
+        if os.path.exists(self.ca_cert):
+            curl.setopt(pycurl.CAINFO, self.ca_cert)
+        else:
+            self.log.warn("Missing certificate: %s" % self.ca_cert)
+
+        return curl
+
+    def _do_curl(self, file_hash, file):
+        """Use curl manually to upload a file
+
+        This is shamelessly copy-pasted from fedpkg.
+        Contribute any changes back upstream.
+        """
+        # This is overloaded to add in the Network Box user's cert
+        cmd = ['curl', '-k', '--cert', self.cert_file, '--fail', '-o',
+               '/dev/null', '--show-error', '--progress-bar', '-F',
+               'name=%s' % self.module_name, '-F', 'md5sum=%s' % file_hash,
+               '-F', 'file=@%s' % file]
+        if self.quiet:
+            cmd.append('-s')
+        cmd.append(self.lookaside_cgi)
+        self._run_command(cmd)
 
     # -- New features --------------------------------------------------------
     def _findmasterbranch(self):
