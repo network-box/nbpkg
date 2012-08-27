@@ -196,6 +196,12 @@ class Commands(pyrpkg.Commands):
                                              self.repo.active_branch.name
                                              ).split()))
 
+        # Move the active branch to the end, so that merged upstream branches
+        # get pushed first
+        if self.repo.active_branch.name in merged:
+            merged.remove(self.repo.active_branch.name)
+            merged.append(self.repo.active_branch.name)
+
         if not merged:
             raise pyrpkg.rpkgError('Could not find any local branch to push')
 
