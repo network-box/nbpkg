@@ -176,6 +176,17 @@ class Commands(pyrpkg.Commands):
                                                           "serverca"))
 
     # -- Overloaded features -------------------------------------------------
+    def clone(self, module, path=None, branch=None, bare_dir=None, anon=False):
+        """Clone a repo, optionally check out a specific branch.
+
+        This overloads the pyrpkg method, to always checkout the 'nbplayground'
+        branch by default.
+        """
+        if not branch:
+            branch = 'nbplayground'
+
+        super(Commands, self).clone(module, path, branch, bare_dir, anon)
+
     def push(self):
         """Push changes to the remote repository"""
         # First check that we are not pushing to Fedora
