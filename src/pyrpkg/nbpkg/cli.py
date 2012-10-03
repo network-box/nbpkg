@@ -31,12 +31,20 @@ class nbpkgClient(cliClient):
 
     def setup_nb_subparsers(self):
         """Register the Network Box specific targets."""
-        self.register_retire()
         self.register_fetchfedora()
+        self.register_retire()
         self.register_sourcesfedora()
 
     # -- New targets ---------------------------------------------------------
     # --- First register them ---
+    def register_fetchfedora(self):
+        """Register the fetchfedora command."""
+        fetchfedora_parser = self.subparsers.add_parser('fetchfedora',
+                help='Get changes from Fedora',
+                description='This will fetch the history of the module in \
+                        Fedora, adding the remote if necessary.')
+        fetchfedora_parser.set_defaults(command=self.fetchfedora)
+
     def register_retire(self):
         """Register the retire target"""
 
@@ -54,14 +62,6 @@ class nbpkgClient(cliClient):
                                    help='Message for retiring the package')
         retire_parser.set_defaults(command=self.retire)
 
-    def register_fetchfedora(self):
-        """Register the fetchfedora command."""
-        fetchfedora_parser = self.subparsers.add_parser('fetchfedora',
-                help='Get changes from Fedora',
-                description='This will fetch the history of the module in \
-                        Fedora, adding the remote if necessary.')
-        fetchfedora_parser.set_defaults(command=self.fetchfedora)
-
     def register_sourcesfedora(self):
         """Register the sourcesfedora command."""
         sourcesfedora_parser = self.subparsers.add_parser('sourcesfedora',
@@ -73,6 +73,13 @@ class nbpkgClient(cliClient):
         sourcesfedora_parser.set_defaults(command=self.sourcesfedora)
 
     # --- Then implement them ---
+    def fetchfedora(self):
+        try:
+            self.cmd.fetchfedora()
+        except Exception, e:
+            self.log.error('Could not run fetchfedora: %s' % e)
+            sys.exit(1)
+
     def retire(self):
         try:
             self.cmd.retire(self.args.msg)
@@ -82,13 +89,6 @@ class nbpkgClient(cliClient):
 
         if self.args.push:
             self.push()
-
-    def fetchfedora(self):
-        try:
-            self.cmd.fetchfedora()
-        except Exception, e:
-            self.log.error('Could not run fetchfedora: %s' % e)
-            sys.exit(1)
 
     def sourcesfedora(self):
         try:
