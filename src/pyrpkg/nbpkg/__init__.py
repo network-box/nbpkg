@@ -355,6 +355,9 @@ class Commands(pyrpkg.Commands):
         """Synchronise with the Fedora dist-git module."""
         self.fedora_remote.fetch('--no-tags')
 
+    def upload_fedora(self, files, replace=False):
+        pass
+
     def sourcesfedora(self):
         """Fetch sources from the Fedora lookaside cache."""
         self.sources(lookasideurl="http://pkgs.fedoraproject.org/repo/pkgs")

@@ -32,6 +32,7 @@ class nbpkgClient(cliClient):
     def setup_nb_subparsers(self):
         """Register the Network Box specific targets."""
         self.register_fetchfedora()
+        self.register_newsourcesfedora()
         self.register_retire()
         self.register_sourcesfedora()
 
@@ -44,6 +45,19 @@ class nbpkgClient(cliClient):
                 description='This will fetch the history of the module in \
                         Fedora, adding the remote if necessary.')
         fetchfedora_parser.set_defaults(command=self.fetchfedora)
+
+    def register_newsourcesfedora(self):
+        """Register the new-sources-fedora command."""
+        new_sources_fedora_parser = self.subparsers.add_parser(
+                "new-sources-fedora",
+                help="Upload new sourcefiles to the Fedora lookaside cache",
+                description="This will upload new source files to the Fedora"
+                            "lookaside cache and remove any existing files. "
+                            "The sources and .gitignore files will be updated"
+                            " for the new file(s).")
+        new_sources_fedora_parser.add_argument("files", nargs="+")
+        new_sources_fedora_parser.set_defaults(command=self.new_sources_fedora,
+                                               replace=True)
 
     def register_retire(self):
         """Register the retire target"""
@@ -79,6 +93,24 @@ class nbpkgClient(cliClient):
         except Exception, e:
             self.log.error('Could not run fetchfedora: %s' % e)
             sys.exit(1)
+
+    def new_sources_fedora(self):
+        # This is all mostly copy-pasted from pyrpkg.rpkgCli.new_sources(),
+        # except for the lines clearly marked as being different.
+        #
+        # Make sure to keep it all in sync!
+
+        # Check to see if the files passed exist
+        for file in self.args.files:
+            if not os.path.isfile(file):
+                raise Exception('Path does not exist or is '
+                                'not a file: %s' % file)
+
+        # -- This is the only difference with pyrpkg.rpkgCli.new_sources() ---
+        self.cmd.upload_fedora(self.args.files, replace=self.args.replace)
+
+        self.log.info("Source upload succeeded. Don't forget to commit the "
+                      "sources file")
 
     def retire(self):
         try:
