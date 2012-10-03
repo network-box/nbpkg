@@ -40,6 +40,8 @@ class Commands(pyrpkg.Commands):
 
         # To interact with the Fedora infrastructure
         self._fedora_remote = None
+        self._fedora_cert_file = None
+        self._fedora_ca_cert = None
 
     # -- Overloaded property loaders -----------------------------------------
     def load_rpmdefines(self):
@@ -148,6 +150,39 @@ class Commands(pyrpkg.Commands):
                                                             "cert"))
             self._ca_cert = os.path.expanduser(config.get(self.build_client,
                                                           "serverca"))
+
+    @property
+    def fedora_cert_file(self):
+        """This property ensures the fedora_cert_file attribute"""
+
+        if not self._fedora_cert_file:
+            self.load_fedora_cert_files()
+        return self._fedora_cert_file
+
+    @property
+    def fedora_ca_cert(self):
+        """This property ensures the fedora_ca_cert attribute"""
+
+        if not self._fedora_ca_cert:
+            self.load_fedora_cert_files()
+        return self._fedora_ca_cert
+
+    def load_fedora_cert_files(self):
+        """This loads the fedora_cert_file and fedora_ca_cert attributes"""
+        import ConfigParser
+
+        with open(self.fedora_kojiconfig) as f:
+            config = ConfigParser.ConfigParser()
+            config.readfp(f)
+
+            if not config.has_section(os.path.basename(self.build_client)):
+                raise pyrpkg.rpkgError("Can't find the [%s] section in the "
+                                       "Koji config" % self.build_client)
+
+            self._fedora_cert_file = os.path.expanduser(
+                                config.get(self.build_client, "cert"))
+            self._fedora_ca_cert = os.path.expanduser(
+                                config.get(self.build_client, "serverca"))
 
     @property
     def fedora_remote(self):
