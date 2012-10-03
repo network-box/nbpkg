@@ -109,34 +109,6 @@ class Commands(pyrpkg.Commands):
 
     # -- New properties ------------------------------------------------------
     @property
-    def fedora_remote(self):
-        """Return the remote object associated with the Fedora dist-git."""
-        if not self._fedora_remote:
-            self.load_fedora_remote()
-        return self._fedora_remote
-
-    def load_fedora_remote(self):
-        """Search if we already have a fedora remote."""
-        for remote in self.repo.remotes:
-            # FIXME: Don't hard-code those values, get the fedpkg config
-            if remote.name == 'fedora':
-                self._fedora_remote = remote
-                break
-
-        else:
-            # We finished iterating without finding a Fedora remote
-            try:
-                module_name = self.module_name
-            except pyrpkg.rpkgError, e:
-                # This happens when we don't have a spec file yet (e.g merging
-                # from Fedora for the first time)
-                module_name = os.path.basename(self.path)
-
-            # FIXME: Don't hard-code those values, get the fedpkg config
-            self._fedora_remote = self.repo.create_remote('fedora',
-                    'git://pkgs.fedoraproject.org/%s' % module_name)
-
-    @property
     def cert_file(self):
         """This property ensures the cert_file attribute
 
@@ -174,6 +146,34 @@ class Commands(pyrpkg.Commands):
                                                             "cert"))
             self._ca_cert = os.path.expanduser(config.get(self.build_client,
                                                           "serverca"))
+
+    @property
+    def fedora_remote(self):
+        """Return the remote object associated with the Fedora dist-git."""
+        if not self._fedora_remote:
+            self.load_fedora_remote()
+        return self._fedora_remote
+
+    def load_fedora_remote(self):
+        """Search if we already have a fedora remote."""
+        for remote in self.repo.remotes:
+            # FIXME: Don't hard-code those values, get the fedpkg config
+            if remote.name == 'fedora':
+                self._fedora_remote = remote
+                break
+
+        else:
+            # We finished iterating without finding a Fedora remote
+            try:
+                module_name = self.module_name
+            except pyrpkg.rpkgError, e:
+                # This happens when we don't have a spec file yet (e.g merging
+                # from Fedora for the first time)
+                module_name = os.path.basename(self.path)
+
+            # FIXME: Don't hard-code those values, get the fedpkg config
+            self._fedora_remote = self.repo.create_remote('fedora',
+                    'git://pkgs.fedoraproject.org/%s' % module_name)
 
     # -- Overloaded features -------------------------------------------------
     def clone(self, module, path=None, branch=None, bare_dir=None, anon=False):
