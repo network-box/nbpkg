@@ -35,9 +35,11 @@ class Commands(pyrpkg.Commands):
                 kojiconfig, build_client, user, dist, target, quiet)
 
         # New properties
-        self._fedora_remote = None
         self._cert_file = None
         self._ca_cert = None
+
+        # To interact with the Fedora infrastructure
+        self._fedora_remote = None
 
     # -- Overloaded property loaders -----------------------------------------
     def load_rpmdefines(self):
