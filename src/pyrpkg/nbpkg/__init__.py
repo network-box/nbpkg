@@ -243,13 +243,13 @@ class Commands(pyrpkg.Commands):
         # Call the super class
         curl = super(Commands, self)._create_curl()
 
-        # Set the users Fedora certificate:
+        # Set the user's certificate:
         if os.path.exists(self.cert_file):
             curl.setopt(pycurl.SSLCERT, self.cert_file)
         else:
             self.log.warn("Missing certificate: %s" % self.cert_file)
 
-        # Set the Fedora CA certificate:
+        # Set the CA certificate:
         if os.path.exists(self.ca_cert):
             curl.setopt(pycurl.CAINFO, self.ca_cert)
         else:
@@ -263,7 +263,7 @@ class Commands(pyrpkg.Commands):
         This is shamelessly copy-pasted from fedpkg.
         Contribute any changes back upstream.
         """
-        # This is overloaded to add in the Network Box user's cert
+        # This is overloaded to add in the user's cert
         cmd = ['curl', '-k', '--cert', self.cert_file, '--fail', '-o',
                '/dev/null', '--show-error', '--progress-bar', '-F',
                'name=%s' % self.module_name, '-F', 'md5sum=%s' % file_hash,
