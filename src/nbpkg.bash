@@ -36,7 +36,7 @@ _nbpkg()
     local options="--help -v -q"
     local options_value="--dist --user --path"
     local commands="build chain-build ci clean clog clone co commit compile diff fetchfedora gimmespec giturl help \
-    import install lint local mockbuild new new-sources patch prep pull push retire scratch-build sources sourcesfedora \
+    import install lint local mockbuild new new-sources new-sources-fedora patch prep pull push retire scratch-build sources sourcesfedora \
     srpm switch-branch tag tag-request unused-patches update upload verify-files verrel"
 
     # parse main options and get command
@@ -181,7 +181,7 @@ _nbpkg()
         tag-request)
             options_string="--desc --build"
             ;;
-        upload|new-sources)
+        upload|new-sources|new-sources-fedora)
             after="file"
             after_more=true
             ;;
