@@ -129,6 +129,19 @@ class nbpkgClient(cliClient):
             self.log.error('Could not run sourcesfedora: %s' % e)
             sys.exit(1)
 
+    # -- Overloaded properties -----------------------------------------------
+    def load_cmd(self):
+        """This sets up the cmd object"""
+        super(nbpkgClient, self).load_cmd()
+
+        # This is how pyrpkg gets that info, yuck
+        site = os.path.basename(sys.argv[0])
+
+        self._cmd.fedora_lookaside_cgi = self.config.get(site,
+                                                         "fedora_lookaside_cgi")
+        self._cmd.fedora_kojiconfig = self.config.get(site,
+                                                      "fedora_kojiconfig")
+
     # -- Overloaded targets --------------------------------------------------
     def clone(self):
         """Overload the rpkg method, to remove anonymous clone."""
