@@ -173,9 +173,8 @@ class Commands(pyrpkg.Commands):
                 # from Fedora for the first time)
                 module_name = os.path.basename(self.path)
 
-            # FIXME: Don't hard-code those values, get the fedpkg config
             self._fedora_remote = self.repo.create_remote('fedora',
-                    'git://pkgs.fedoraproject.org/%s' % module_name)
+                    self.fedora_anongiturl % {"module": module_name})
 
     # -- Overloaded features -------------------------------------------------
     def clone(self, module, path=None, branch=None, bare_dir=None, anon=False):
@@ -360,4 +359,4 @@ class Commands(pyrpkg.Commands):
 
     def sourcesfedora(self):
         """Fetch sources from the Fedora lookaside cache."""
-        self.sources(lookasideurl="http://pkgs.fedoraproject.org/repo/pkgs")
+        self.sources(lookasideurl=self.fedora_lookaside)
