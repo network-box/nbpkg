@@ -37,6 +37,7 @@ class Commands(pyrpkg.Commands):
         # New properties
         self._cert_file = None
         self._ca_cert = None
+        self._freedom = None
 
         # To interact with the Fedora infrastructure
         self._fedora_remote = None
@@ -210,6 +211,18 @@ class Commands(pyrpkg.Commands):
 
             self._fedora_remote = self.repo.create_remote('fedora',
                     self.fedora_anongiturl % {"module": module_name})
+
+    @property
+    def freedom(self):
+        if not self._freedom:
+            self.load_freedom()
+        return self._freedom
+
+    def load_freedom(self):
+        if "nonfree" in self.remote:
+            self._freedom = False
+        else:
+            self._freedom = True
 
     # -- Overloaded features -------------------------------------------------
     def clone(self, module, path=None, branch=None, bare_dir=None, anon=False):
