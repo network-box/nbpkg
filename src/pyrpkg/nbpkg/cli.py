@@ -137,15 +137,16 @@ class nbpkgClient(cliClient):
         # This is how pyrpkg gets that info, yuck
         site = os.path.basename(sys.argv[0])
 
-        self._cmd.fedora_lookaside = self.config.get(site,
-                                                     "fedora_lookaside")
-        self._cmd.fedora_lookaside_cgi = self.config.get(site,
-                                                         "fedora_lookaside_cgi")
-        self._cmd.fedora_kojiconfig = self.config.get(site,
-                                                      "fedora_kojiconfig")
-        self._cmd.fedora_anongiturl = self.config.get(site,
-                                                      "fedora_anongiturl",
-                                                      raw=True)
+        if self._cmd.freedom:
+            self._cmd.fedora_lookaside = self.config.get(site,
+                                                         "fedora_lookaside")
+            self._cmd.fedora_lookaside_cgi = self.config.get(site,
+                                                             "fedora_lookaside_cgi")
+            self._cmd.fedora_kojiconfig = self.config.get(site,
+                                                          "fedora_kojiconfig")
+            self._cmd.fedora_anongiturl = self.config.get(site,
+                                                          "fedora_anongiturl",
+                                                          raw=True)
 
     # -- Overloaded targets --------------------------------------------------
     def clone(self):
