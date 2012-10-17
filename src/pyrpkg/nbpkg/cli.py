@@ -131,22 +131,41 @@ class nbpkgClient(cliClient):
 
     # -- Overloaded properties -----------------------------------------------
     def load_cmd(self):
-        """This sets up the cmd object"""
-        super(nbpkgClient, self).load_cmd()
+        """This sets up the cmd object.
 
-        # This is how pyrpkg gets that info, yuck
+        We need to overload it to pass our extra arguments."""
+        # Load up the library based on exe name
         site = os.path.basename(sys.argv[0])
 
-        if self._cmd.freedom:
-            self._cmd.fedora_lookaside = self.config.get(site,
-                                                         "fedora_lookaside")
-            self._cmd.fedora_lookaside_cgi = self.config.get(site,
-                                                             "fedora_lookaside_cgi")
-            self._cmd.fedora_kojiconfig = self.config.get(site,
-                                                          "fedora_kojiconfig")
-            self._cmd.fedora_anongiturl = self.config.get(site,
-                                                          "fedora_anongiturl",
-                                                          raw=True)
+        # Set target if we got it as an option
+        target = None
+        if hasattr(self.args, 'target') and self.args.target:
+            target = self.args.target
+
+        # load items from the config file
+        items = dict(self.config.items(site, raw=True))
+
+        # Create the cmd object
+        self._cmd = self.site.Commands(self.args.path,
+                                       items['lookaside'],
+                                       items['lookasidehash'],
+                                       items['lookaside_cgi'],
+                                       items['gitbaseurl'],
+                                       items['anongiturl'],
+                                       items['branchre'],
+                                       items.get('remote', 'origin'),
+                                       items['kojiconfig'],
+                                       items['build_client'],
+                                       # -- nbpkg-specific arguments ---------
+                                       items['fedora_lookaside'],
+                                       items['fedora_lookaside_cgi'],
+                                       items['fedora_kojiconfig'],
+                                       items['fedora_anongiturl'],
+                                       # -- end of nbpkg-specific arguments --
+                                       user=self.args.user,
+                                       dist=self.args.dist,
+                                       target=target,
+                                       quiet=self.args.q)
 
     # -- Overloaded targets --------------------------------------------------
     def clone(self):

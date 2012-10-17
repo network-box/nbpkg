@@ -24,8 +24,12 @@ import cli
 class Commands(pyrpkg.Commands):
     def __init__(self, path, lookaside, lookasidehash, lookaside_cgi,
             gitbaseurl, anongiturl, branchre, remote, kojiconfig,
-            build_client, user=None, dist=None, target=None,
-            quiet=False):
+            build_client,
+            # -- nbpkg-specific arguments ------------------------------------
+            fedora_lookaside, fedora_lookaside_cgi, fedora_kojiconfig,
+            fedora_anongiturl,
+            # -- end of nbpkg-specific arguments -----------------------------
+            user=None, dist=None, target=None, quiet=False):
         """Init the object and some configuration details.
 
         We need to overload this to add our own attributes and properties.
@@ -33,6 +37,12 @@ class Commands(pyrpkg.Commands):
         super(Commands, self).__init__(path, lookaside, lookasidehash,
                 lookaside_cgi, gitbaseurl, anongiturl, branchre, remote,
                 kojiconfig, build_client, user, dist, target, quiet)
+
+        # New attributes
+        self.fedora_lookaside = fedora_lookaside
+        self.fedora_lookaside_cgi = fedora_lookaside_cgi
+        self.fedora_kojiconfig = fedora_kojiconfig
+        self.fedora_anongiturl = fedora_anongiturl
 
         # New properties
         self._cert_file = None
