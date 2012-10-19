@@ -157,10 +157,10 @@ class nbpkgClient(cliClient):
                                        items['kojiconfig'],
                                        items['build_client'],
                                        # -- nbpkg-specific arguments ---------
-                                       items['fedora_lookaside'],
-                                       items['fedora_lookaside_cgi'],
-                                       items['fedora_kojiconfig'],
-                                       items['fedora_anongiturl'],
+                                       items.get('fedora_lookaside', ''),
+                                       items.get('fedora_lookaside_cgi', ''),
+                                       items.get('fedora_kojiconfig', ''),
+                                       items.get('fedora_anongiturl', ''),
                                        # -- end of nbpkg-specific arguments --
                                        user=self.args.user,
                                        dist=self.args.dist,
