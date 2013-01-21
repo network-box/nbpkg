@@ -290,11 +290,10 @@ class Commands(pyrpkg.Commands):
         # Don't pass that additional parameter to our parent
         super(Commands, self).sources(outdir=outdir)
 
-    def _create_curl(self):
+    def _create_curl(self, fedora=False):
         """Common curl setup options used for all requests to lookaside.
 
-        This is shamelessly copy-pasted from fedpkg.
-        Contribute any changes back upstream.
+        This is greatly inspired by the fedpkg code.
         """
         import pycurl
 
@@ -302,34 +301,52 @@ class Commands(pyrpkg.Commands):
         # Call the super class
         curl = super(Commands, self)._create_curl()
 
-        # Set the user's certificate:
-        if os.path.exists(self.cert_file):
-            curl.setopt(pycurl.SSLCERT, self.cert_file)
+        # [NBPKG] Change the lookaside_cgi url and certs
+        if fedora:
+            curl.setopt(pycurl.URL, self.fedora_lookaside_cgi)
+            cert_file = self.fedora_cert_file
+            ca_cert = self.fedora_ca_cert
+
         else:
-            self.log.warn("Missing certificate: %s" % self.cert_file)
+            cert_file = self.cert_file
+            ca_cert = self.ca_cert
+
+        # Set the user's certificate:
+        if os.path.exists(cert_file):
+            curl.setopt(pycurl.SSLCERT, cert_file)
+        else:
+            self.log.warn("Missing certificate: %s" % cert_file)
 
         # Set the CA certificate:
-        if os.path.exists(self.ca_cert):
-            curl.setopt(pycurl.CAINFO, self.ca_cert)
+        if os.path.exists(ca_cert):
+            curl.setopt(pycurl.CAINFO, ca_cert)
         else:
-            self.log.warn("Missing certificate: %s" % self.ca_cert)
+            self.log.warn("Missing certificate: %s" % ca_cert)
 
         return curl
 
-    def _do_curl(self, file_hash, file):
+    def _do_curl(self, file_hash, file, fedora=False):
         """Use curl manually to upload a file
 
-        This is shamelessly copy-pasted from fedpkg.
-        Contribute any changes back upstream.
+        This is greatly inspired by the fedpkg code.
         """
+        # This is overloaded to allow using a different lookaside cache
+        if fedora:
+            lookaside_cgi = self.fedora_lookaside_cgi
+            cert_file = self.fedora_cert_file
+
+        else:
+            lookaside_cgi = self.lookaside_cgi
+            cert_file = self.cert_file
+
         # This is overloaded to add in the user's cert
-        cmd = ['curl', '-k', '--cert', self.cert_file, '--fail', '-o',
+        cmd = ['curl', '-k', '--cert', cert_file, '--fail', '-o',
                '/dev/null', '--show-error', '--progress-bar', '-F',
                'name=%s' % self.module_name, '-F', 'md5sum=%s' % file_hash,
                '-F', 'file=@%s' % file]
         if self.quiet:
             cmd.append('-s')
-        cmd.append(self.lookaside_cgi)
+        cmd.append(lookaside_cgi)
         self._run_command(cmd)
 
     # -- New features --------------------------------------------------------
@@ -413,7 +430,18 @@ class Commands(pyrpkg.Commands):
         self.fedora_remote.fetch('--no-tags')
 
     def upload_fedora(self, files, replace=False):
-        pass
+        # This is not pretty
+        _do_curl_orig = self._do_curl
+        self._do_curl = lambda *args: _do_curl_orig(*args, fedora=True)
+        _create_curl_orig = self._create_curl
+        self._create_curl = lambda *args: _create_curl_orig(*args, fedora=True)
+
+        # Yay!
+        self.upload(files, replace)
+
+        # Remove all trace of the ugliness
+        self._do_curl = _do_curl_orig
+        self._create_curl = _create_curl_orig
 
     def sourcesfedora(self):
         """Fetch sources from the Fedora lookaside cache."""
