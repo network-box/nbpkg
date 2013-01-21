@@ -9,8 +9,8 @@
 # option) any later version.  See http://www.gnu.org/copyleft/gpl.html for
 # the full text of the license.
 #
-# This program is based on the GPLv2+-licensed fedpkg library by Jesse Keating:
-#     https://fedorahosted.org/fedora-packager
+# This program is based on the GPLv2+-licensed rpkg library by Jesse Keating:
+#     https://fedorahosted.org/rpkg
 
 import os
 import re
