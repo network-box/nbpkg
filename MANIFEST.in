@@ -1,2 +1,3 @@
-include *.txt
-recursive-include src *.bash *.conf
+include COPYING
+include src/nbpkg.bash
+include src/nbpkg.conf
