@@ -8,7 +8,7 @@ setup(
     author_email = "mathieu.bridon@network-box.com",
     description = "Utility to interact with the Network Box Packaging system",
     license = "GPLv2+",
-    url = "https://www.network-box.com",
+    url = "https://github.com/network-box/nbpkg",
     package_dir = {'': 'src'},
     packages = ['pyrpkg/nbpkg'],
     scripts = ['src/nbpkg'],
