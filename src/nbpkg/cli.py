@@ -87,6 +87,9 @@ class nbpkgClient(cliClient):
                             'SourceX in the spec file, but instead of using' \
                             ' the configured lookaside URL, it will use the' \
                             ' Fedora one.')
+        sourcesfedora_parser.add_argument("--name",
+                help="The original name of the module in Fedora, if "
+                     "different.")
         sourcesfedora_parser.set_defaults(command=self.sourcesfedora)
 
     # --- Then implement them ---
@@ -130,7 +133,7 @@ class nbpkgClient(cliClient):
 
     def sourcesfedora(self):
         try:
-            self.cmd.sourcesfedora()
+            self.cmd.sourcesfedora(self.args.name)
         except Exception, e:
             self.log.error('Could not run sourcesfedora: %s' % e)
             sys.exit(1)

@@ -470,6 +470,15 @@ class Commands(pyrpkg.Commands):
         self._do_curl = _do_curl_orig
         self._create_curl = _create_curl_orig
 
-    def sourcesfedora(self):
+    def sourcesfedora(self, module_name=None):
         """Fetch sources from the Fedora lookaside cache."""
+        if module_name is not None:
+            # This is really bad...
+            old_module_name = self.module_name
+            self._module_name = module_name
+
         self.sources(lookasideurl=self.fedora_lookaside)
+
+        if module_name is not None:
+            # ... And so is this
+            self._module_name = old_module_name
