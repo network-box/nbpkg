@@ -208,19 +208,20 @@ class Commands(pyrpkg.Commands):
             # FIXME: Don't hard-code those values, get the fedpkg config
             if remote.name == 'fedora':
                 self._fedora_remote = remote
-                break
+                return
 
-        else:
+        if True:
             # We finished iterating without finding a Fedora remote
             try:
                 module_name = self.module_name
+
             except pyrpkg.rpkgError, e:
                 # This happens when we don't have a spec file yet (e.g merging
                 # from Fedora for the first time)
                 module_name = os.path.basename(self.path)
 
-            self._fedora_remote = self.repo.create_remote('fedora',
-                    self.fedora_anongiturl % {"module": module_name})
+        self._fedora_remote = self.repo.create_remote('fedora',
+                self.fedora_anongiturl % {"module": module_name})
 
     @property
     def freedom(self):
