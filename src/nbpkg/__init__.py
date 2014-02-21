@@ -303,10 +303,14 @@ class Commands(pyrpkg.Commands):
         the configured one.
         """
         if lookasideurl:
+            old_lookaside = self.lookaside
             self.lookaside = lookasideurl
 
         # Don't pass that additional parameter to our parent
         super(Commands, self).sources(outdir=outdir)
+
+        if lookasideurl:
+            self.lookaside = old_lookaside
 
     def _create_curl(self, fedora=False):
         """Common curl setup options used for all requests to lookaside.
