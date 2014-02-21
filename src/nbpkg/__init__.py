@@ -445,7 +445,12 @@ class Commands(pyrpkg.Commands):
 
     def fetchfedora(self):
         """Synchronise with the Fedora dist-git module."""
-        self.fedora_remote.fetch('--no-tags')
+        try:
+            self.fedora_remote.fetch('--no-tags')
+
+        except git.cmd.GitCommandError as e:
+            raise pyrpkg.rpkgError("%s\n(did you forget about the --name "
+                                   "option?)" % e)
 
     def upload_fedora(self, files, replace=False):
         # This is not pretty
