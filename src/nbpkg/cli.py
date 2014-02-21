@@ -44,6 +44,9 @@ class nbpkgClient(cliClient):
                 help='Get changes from Fedora',
                 description='This will fetch the history of the module in \
                         Fedora, adding the remote if necessary.')
+        fetchfedora_parser.add_argument("--name",
+                                        help="The original name of the module"
+                                             "in Fedora, it different.")
         fetchfedora_parser.set_defaults(command=self.fetchfedora)
 
     def register_newsourcesfedora(self):
@@ -89,6 +92,9 @@ class nbpkgClient(cliClient):
     # --- Then implement them ---
     def fetchfedora(self):
         try:
+            if self.args.name:
+                self.cmd.load_fedora_remote(self.args.name)
+
             self.cmd.fetchfedora()
         except Exception, e:
             self.log.error('Could not run fetchfedora: %s' % e)

@@ -202,16 +202,33 @@ class Commands(pyrpkg.Commands):
             self.load_fedora_remote()
         return self._fedora_remote
 
-    def load_fedora_remote(self):
+    def load_fedora_remote(self, module_name=None):
         """Search if we already have a fedora remote."""
-        for remote in self.repo.remotes:
-            # FIXME: Don't hard-code those values, get the fedpkg config
-            if remote.name == 'fedora':
-                self._fedora_remote = remote
-                return
+        if module_name:
+            # Do we already have a Fedora remote? ...
+            for remote in self.repo.remotes:
+                if remote.name == 'fedora':
+                    # ... Yes, ...
+                    old_name = remote.config_reader.get("url").strip("/")[-1]
+                    if old_name != module_name:
+                        # ... but it's wrong, drop it
+                        self.repo.delete_remote('fedora')
+                        break
 
-        if True:
-            # We finished iterating without finding a Fedora remote
+                    else:
+                        # ... and it's right, keep it
+                        self._fedora_remote = remote
+                        return
+
+        else:
+            # Do we already have a Fedora remote? ...
+            for remote in self.repo.remotes:
+                if remote.name == 'fedora':
+                    # ... Yes, so use it
+                    self._fedora_remote = remote
+                    return
+
+            # ... No, so get the module name
             try:
                 module_name = self.module_name
 
