@@ -380,7 +380,7 @@ class Commands(pyrpkg.Commands):
 
         # Create a regex to find branches that exactly match nb#.#.  Should not
         # catch branches such as nb5.0-foobar
-        branchre = r'nb\d\.\d$'
+        branchre = r'nb\d$'
 
         # Find the repo refs
         for ref in self.repo.refs:
@@ -400,11 +400,8 @@ class Commands(pyrpkg.Commands):
             # ... so we can take the last one and strip it from its 'nb'...
             latest_distval = nbrses[-1].strip('nb')
 
-            # ... then split it into two integers...
-            tokens = latest_distval.split('.')
-
             # ... so we can add 1 to the last one and recreate the new dist
-            return "%s.%s" % (tokens[0], (int(tokens[1])+1))
+            return "%d" % (int(latest_distval)+1)
 
         else:
             # We may not have NBRSes. Find out what experimental target does.
