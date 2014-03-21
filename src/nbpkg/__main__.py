@@ -68,6 +68,10 @@ def main():
             sys.stderr.write(str(e)+'\n')
             sys.exit(1)
     
+    elif other[-1] in ['--help', '-h', 'help']:
+        # Doesn't matter, the user wants some help, so just pick one config
+        args.config = FREE_CONF
+
     else:
         sys.stderr.write("Could not automatically determine free/nonfree status, aborting.\n")
         sys.stderr.write("You probably aren't in a cloned directory or forgot to specify the --path option.\n")
